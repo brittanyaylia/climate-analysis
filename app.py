@@ -51,3 +51,12 @@ def Precipitation():
 
     return jsonify(prcp_list)
 
+#Station route
+@app.route("/api/v1.0/stations")
+
+def Stations():
+    stations = Session.query(station.station, station.name).all()
+    stations_list = list(stations)
+
+    return jsonify(stations_list)
+
