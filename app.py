@@ -89,3 +89,7 @@ def start_end(start, end):
     start_end_list = list(start_end)
 
     return jsonify(start_end_list)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
