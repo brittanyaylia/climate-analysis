@@ -1,7 +1,7 @@
-#Import Flask
+#mport Flask
 from flask import Flask, jsonify
 
-#Dependencies
+#dependencies
 import numpy as np 
 import datetime as dt
 import sqlalchemy
@@ -10,25 +10,25 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 from sqlalchemy.pool import StaticPool
 
-#Create engine
+#create engine
 engine = create_engine("sqlite:///Resources/hawaii.sqlite")
 
-#Reflect existing db & tables
+#reflect existing db & tables
 Base = automap_base()
 Base.prepare(engine, reflect=True)
 
-#Save references to tables
+#save to tables
 measure = Base.classes.measurement
 station = Base.classes.station
 Session = Session(engine)
 
-#Create app
+#create app
 app = Flask(__name__)
 
-#Home route
+#home route
 @app.route("/")
 
-def Welcome():
+def welcome():
     return(
         f"Climate API Homepage<br/>"
         f"Routes: <br/>"
@@ -39,9 +39,9 @@ def Welcome():
         f"/api/v1.0/<start>/<end>"
     )
 
-#Precipitation route
+#precipitation route
 @app.route("/api/v1.0/precipitation")
-def Precipitation():
+def orecipitation():
     one_year = dt.date(2017, 8, 23) - dt.timedelta(days = 365)
     prcp = Session.query(measure.date, measure.prcp).\
         filter(measure.date >= one_year).\
@@ -50,9 +50,9 @@ def Precipitation():
 
     return jsonify(prcp_list)
 
-#Station route
+#station route
 @app.route("/api/v1.0/stations")
-def Stations():
+def stations():
     stations = Session.query(station.station, station.name).all()
     stations_list = list(stations)
 
@@ -69,15 +69,23 @@ def tobs():
 
     return jsonify(tobs_list)
 
-#Start route
+#start route
 @app.route("/api/v1.0/<start>")
 def start_date(start):
-    start_date = Session.query(measure.date, func.min(measure.tobs), 
-                func.avg(measure.tobs), func.max(measure.tobs)).\
-                    filter(measure.date >= start).\
-                    group_by(measure.date).all()
+    start_date = Session.query(measure.date, func.min(measure.tobs), func.avg(measure.tobs), func.max(measure.tobs)).\
+        filter(measure.date >= start).\
+        group_by(measure.date).all()
     start_list = list(start_date)
 
     return jsonify(start_list)
 
+#start/end route
+@app.route("/api/v1.0/<start>/<end>")
+def start_end(start, end):
+    start_end = Session.query(measure.date, func.min(measure.tobs), func.avg(measure.tobs), func.max(measure.tobs)).\
+        filter(measure.date >= start).\
+        filter(measure.date <= end).\
+        group_by(measure.date).all()
+    start_end_list = list(start_end)
 
+    return jsonify(start_end_list)
